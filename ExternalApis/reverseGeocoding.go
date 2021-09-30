@@ -1,4 +1,4 @@
-package main
+package externalapis
 
 import (
 	"encoding/json"
@@ -22,27 +22,15 @@ func getByGeoCoordinates(lat string, lng string) {
 		log.Fatal(err)
 	}
 	body, _ := ioutil.ReadAll(res.Body)
+	fmt.Print(body)
 	defer res.Body.Close()
 	var json_data Document
 	json.Unmarshal([]byte(body), &json_data)
-	location_data := json_data.Results
-	state := location_data[0]["state"]
+	state := json_data
 	fmt.Print(state)
-
 }
 
 func main() {
-	// clientOptions := options.Client().
-	// 	ApplyURI("mongodb+srv://pankaj:jc420931@cluster.q37h2.mongodb.net/test?retryWrites=true&w=majority")
-	// ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	// defer cancel()
-	// client, err := mongo.Connect(ctx, clientOptions)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// db := client.Database("covid")
-	// collection := db.Collection("statewise")
-	// fmt.Println(collection)
 	lat := "28.569548"
 	lng := "74.856954"
 	getByGeoCoordinates(lat, lng)
