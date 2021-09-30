@@ -14,24 +14,25 @@ type Document struct {
 	Version      string              `json:"version"`
 }
 
-func getByGeoCoordinates(lat string, lng string) {
+func GetByGeoCoordinates(lat string, lng string) (string, error) {
 
 	query := fmt.Sprintf("https://apis.mapmyindia.com/advancedmaps/v1/ffc5994b9c25a64dc5267125382805b5/rev_geocode?lat=%s&lng=%s&region=IND", lat, lng)
 	res, err := http.Get(query)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 	body, _ := ioutil.ReadAll(res.Body)
-	fmt.Print(body)
 	defer res.Body.Close()
 	var json_data Document
 	json.Unmarshal([]byte(body), &json_data)
-	state := json_data
-	fmt.Print(state)
+	fmt.Println(json_data)
+	result := json_data.Results[0]
+	state := result["state"]
+	return state, err
 }
 
 func main() {
 	lat := "28.569548"
 	lng := "74.856954"
-	getByGeoCoordinates(lat, lng)
+	GetByGeoCoordinates(lat, lng)
 }

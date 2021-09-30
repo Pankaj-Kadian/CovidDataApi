@@ -26,10 +26,10 @@ type ResponseData struct {
 	Last_updated      time.Time `json:"last_updated" bson:"last_updated"`
 }
 
-func init() {
-	final_data := GettingData()
-	InsertingData(final_data)
-}
+// func init() {
+// 	final_data := GettingData()
+// 	InsertingData(final_data)
+// }
 
 func conversion(covid_data interface{}) int {
 	var totalInt int64 = int64(covid_data.(float64))
@@ -107,7 +107,8 @@ func InsertingData(final_data map[string]ResponseData) {
 func GetData(state_code string) (ResponseData, error) {
 	collection := Config.ConnectionMongoDb()
 	var findOne ResponseData
-	err := collection.FindOne(context.Background(), bson.M{"state_code": state_code}).Decode(&findOne)
+	state := Config.GetStateCodes()[state_code]
+	err := collection.FindOne(context.Background(), bson.M{"state_code": state}).Decode(&findOne)
 	if err != nil {
 		log.Fatal(err)
 	}
