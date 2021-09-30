@@ -1,0 +1,44 @@
+BR 725948
+KL 4.652783e+06
+TR 84102
+GJ 825896
+LA 20788
+MP 792511
+MH 6.544606e+06
+ML 81161
+OR 1.025874e+06
+WB 1.567573e+06
+TT 3.3717278e+07
+AR 54444
+CT 1.005295e+06
+GA 176235
+HP 218693
+UP 1.709794e+06
+JH 348209
+KA 2.974528e+06
+TG 665504
+AN 7620
+CH 65219
+MN 120216
+PB 601578
+SK 31355
+AS 601421
+DN 10673
+HR 770847
+MZ 91919
+NL 31195
+PY 126308
+RJ 954320
+AP 2.04823e+06
+DL 1.43878e+06
+JK 329220
+LD 10361
+TN 2.660553e+06
+UT 343519s
+
+
+total_recovered := totalCasesInState["recovered"]
+		total_death := totalCasesInState["deceased"]
+		total_vaccinated1 := totalCasesInState["vaccinated1"]
+		total_vaccinated2 := totalCasesInState["vaccinated2"]
+		total_test := totalCasesInState["tested"]
