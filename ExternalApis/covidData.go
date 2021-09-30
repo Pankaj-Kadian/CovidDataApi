@@ -12,8 +12,6 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ResponseData struct {
@@ -29,8 +27,8 @@ type ResponseData struct {
 }
 
 func init() {
-	final_data := gettingData()
-	insertingData(final_data)
+	final_data := GettingData()
+	InsertingData(final_data)
 }
 
 func conversion(covid_data interface{}) int {
@@ -40,7 +38,7 @@ func conversion(covid_data interface{}) int {
 	return t
 }
 
-func gettingData() map[string]ResponseData {
+func GettingData() map[string]ResponseData {
 	res, err := http.Get("https://data.covid19india.org/v4/min/data.min.json")
 	if err != nil {
 		log.Fatal(err)
@@ -85,17 +83,8 @@ func gettingData() map[string]ResponseData {
 	return final_data
 }
 
-func insertingData(final_data map[string]ResponseData) {
-	clientOptions := options.Client().
-		ApplyURI("mongodb+srv://pankaj:jc420931@cluster.q37h2.mongodb.net/test?retryWrites=true&w=majority")
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, clientOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
-	db := client.Database("covid")
-	collection := db.Collection("statewise")
+func InsertingData(final_data map[string]ResponseData) {
+	collection := Config.ConnectionMongoDb()
 
 	for _, v := range Config.GetStateCodes() {
 		// InsertOne using json
@@ -113,4 +102,24 @@ func insertingData(final_data map[string]ResponseData) {
 		}
 		fmt.Println(final_data[v])
 	}
+}
+
+func GetData(state_code string) (ResponseData, error) {
+	collection := Config.ConnectionMongoDb()
+	var findOne ResponseData
+	err := collection.FindOne(context.Background(), bson.M{"state_code": state_code}).Decode(&findOne)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return findOne, err
+}
+
+func GetAllData() (ResponseData, error) {
+	collection := Config.ConnectionMongoDb()
+	var findOne ResponseData
+	err := collection.FindOne(context.Background(), bson.M{}).Decode(&findOne)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return findOne, err
 }
