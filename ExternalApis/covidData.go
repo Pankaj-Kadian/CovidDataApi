@@ -26,10 +26,16 @@ type ResponseData struct {
 	Last_updated      time.Time `json:"last_updated" bson:"last_updated"`
 }
 
-// func init() {
-// 	final_data := GettingData()
-// 	InsertingData(final_data)
-// }
+type ResponseToUser struct {
+	State_code        string `json:"state_code" bson:"state_code"`
+	Total_cases       int    `json:"total_cases" bson:"total_cases"`
+	Total_recovered   int    `json:"total_recovered" bson:"total_recovered"`
+	Total_death       int    `json:"total_death" bson:"total_death"`
+	Total_vaccinated1 int    `json:"total_vaccinated1" bson:"total_vaccinated1"`
+	Total_vaccinated2 int    `json:"total_vaccinated2" bson:"total_vaccinated2"`
+	Total_tested      int    `json:"total_tested" bson:"total_tested"`
+	Last_updated      string `json:"last_updated" bson:"last_updated"`
+}
 
 func conversion(covid_data interface{}) int {
 	var totalInt int64 = int64(covid_data.(float64))
@@ -60,6 +66,7 @@ func GettingData() map[string]ResponseData {
 		total_vaccinated1 := totalCasesInState["vaccinated1"]
 		total_vaccinated2 := totalCasesInState["vaccinated2"]
 		total_test := totalCasesInState["tested"]
+
 		last_updated_date, _ := time.Parse(time.RFC3339, last_updated.(string))
 
 		total_confirmed_int := conversion(total_confirmed)
@@ -78,6 +85,7 @@ func GettingData() map[string]ResponseData {
 		resData.Total_vaccinated2 = total_vaccinated2_int
 		resData.Total_tested = total_test_int
 		resData.Last_updated = last_updated_date
+		// fmt.Println(resData.Last_updated)
 		final_data[v] = resData
 	}
 	return final_data
@@ -88,19 +96,39 @@ func InsertingData(final_data map[string]ResponseData) {
 
 	for _, v := range Config.GetStateCodes() {
 		// InsertOne using json
-
-		var findOne ResponseData
-		err := collection.FindOne(context.Background(), bson.M{"state_code": v}).Decode(&findOne)
+		_, err := collection.InsertOne(context.Background(), final_data[v])
 		if err != nil {
 			fmt.Print(err)
 		}
-		if findOne.Last_updated != final_data[v].Last_updated {
-			_, err2 := collection.InsertOne(context.Background(), final_data[v])
-			if err2 != nil {
-				fmt.Println(err)
-			}
+
+	}
+}
+func InsertingNewData(final_data map[string]ResponseData) {
+	collection := Config.ConnectionMongoDb()
+
+	for _, v := range Config.GetStateCodes() {
+		// InsertOne using json
+
+		// var findOne ResponseData
+		// err := collection.FindOne(context.Background(), bson.M{"state_code": v}).Decode(&findOne)
+		// if err != nil {
+		// 	fmt.Print(err)
+		// }
+
+		_, err2 := collection.UpdateOne(context.Background(), bson.M{"state": v}, bson.M{"$set": bson.M{
+			"Total_cases":       final_data[v].Total_cases,
+			"Total_recovered":   final_data[v].Total_recovered,
+			"Total_death":       final_data[v].Total_death,
+			"Total_vaccinated1": final_data[v].Total_vaccinated1,
+			"Total_vaccinated2": final_data[v].Total_vaccinated2,
+			"Total_tested":      final_data[v].Total_tested,
+			"Last_updated":      final_data[v].Last_updated,
+		}})
+		if err2 != nil {
+			fmt.Println(err2)
 		}
-		fmt.Println(final_data[v])
+		// 	fmt.Println(final_data[v])
+		// }
 	}
 }
 
@@ -109,18 +137,39 @@ func GetData(state_code string) (ResponseData, error) {
 	var findOne ResponseData
 	state := Config.GetStateCodes()[state_code]
 	err := collection.FindOne(context.Background(), bson.M{"state_code": state}).Decode(&findOne)
-	if err != nil {
-		log.Fatal(err)
+
+	// TO convert time in IST
+	loc, _ := time.LoadLocation("Asia/Kolkata")
+	local := findOne.Last_updated
+	if err == nil {
+		local = local.In(loc)
 	}
+	findOne.Last_updated = local
+	// fmt.Println(findOne)
 	return findOne, err
 }
 
-func GetAllData() (ResponseData, error) {
+func GetAllData() ([]ResponseData, error) {
 	collection := Config.ConnectionMongoDb()
 	var findOne ResponseData
-	err := collection.FindOne(context.Background(), bson.M{}).Decode(&findOne)
+	var find []ResponseData
+	find_cursor, err := collection.Find(context.Background(), bson.M{})
+	for find_cursor.Next(context.Background()) {
+		err := find_cursor.Decode(&findOne)
+		if err != nil {
+			fmt.Println(err)
+		}
+		loc, _ := time.LoadLocation("Asia/Kolkata")
+		local := findOne.Last_updated
+		if err == nil {
+			local = local.In(loc)
+		}
+		findOne.Last_updated = local
+		find = append(find, findOne)
+
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
-	return findOne, err
+	return find, err
 }

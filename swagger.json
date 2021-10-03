@@ -1,0 +1,245 @@
+{
+    "openapi": "3.0.0",
+    "servers": [
+      {
+        "description": "SwaggerHub API Auto Mocking",
+        "url": "https://virtserver.swaggerhub.com/singh.pankaj8848/CovidApi/1.0.0"
+      }
+    ],
+    "info": {
+      "description": "This is a simple API",
+      "version": "1.0.0",
+      "title": "Simple Inventory API",
+      "contact": {
+        "email": "you@your-company.com"
+      },
+      "license": {
+        "name": "Apache 2.0",
+        "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+      }
+    },
+    "tags": [
+      {
+        "name": "developers",
+        "description": "Operations available to regular developers"
+      }
+    ],
+    "paths": {
+      "/GetAllData": {
+        "get": {
+          "tags": [
+            "developers"
+          ],
+          "summary": "All State Data",
+          "operationId": "searchInventory",
+          "description": "It returns the list of all data of each state in json\n",
+          "responses": {
+            "200": {
+              "description": "search results matching criteria",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#models/model_all_states/AllStates"
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "bad input parameter"
+            }
+          }
+        }
+      },
+      "/GetStateData": {
+        "get": {
+          "tags": [
+            "developers"
+          ],
+          "summary": "Data of a particular State",
+          "description": "It returns the covid data of state in json\n",
+          "parameters": [
+            {
+              "in": "query",
+              "name": "state",
+              "description": "Pass a state name in query",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "minimum": 1
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "search results matching criteria",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "items": {
+                      "$ref": "#/models/model_one_state/OneState"
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "bad input parameter"
+            }
+          }
+        }
+      },
+      "/GetByGeoLocation": {
+        "get": {
+          "tags": [
+            "developers"
+          ],
+          "summary": "Data of state based on geolocation",
+          "description": "Returns Indian State data using Geolocation. Location should be of India",
+          "parameters": [
+            {
+              "in": "query",
+              "name": "latitude",
+              "description": "Pass a state name in query",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "minimum": 1
+              }
+            },
+            {
+              "in": "query",
+              "name": "longitude",
+              "description": "Pass a state name in query",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "minimum": 1
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "search results matching criteria",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "items": {
+                      "$ref": "#/models/model_one_state/OneState"
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "invalid input, object invalid"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "AllStates": {
+          "type": "object",
+          "required": [
+            "state_code",
+            "total_cases",
+            "total_recovered",
+            "total_death",
+            "total_vaccinated1",
+            "total_vaccinated2",
+            "total_tested",
+            "last_updated"
+          ],
+          "properties": {
+            "state_code": {
+              "type": "string",
+              "example": "HR"
+            },
+            "total_cases": {
+              "type": "integer",
+              "example": 123456
+            },
+            "total_recovered": {
+              "type": "integer",
+              "example": 120356
+            },
+            "total_death": {
+              "type": "integer",
+              "example": 3654
+            },
+            "total_vaccinated1": {
+              "type": "integer",
+              "example": 658545
+            },
+            "total_vaccinated2": {
+              "type": "integer",
+              "example": 365244
+            },
+            "total_tested": {
+              "type": "integer",
+              "example": 2356878
+            },
+            "last_updated": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2016-08-29T09:12:33.001Z"
+            }
+          }
+        },
+        "OneState": {
+          "type": "object",
+          "required": [
+            "state_code",
+            "total_cases",
+            "total_recovered",
+            "total_death",
+            "total_vaccinated1",
+            "total_vaccinated2",
+            "total_tested",
+            "last_updated"
+          ],
+          "properties": {
+            "state_code": {
+              "type": "string",
+              "example": "HR"
+            },
+            "total_cases": {
+              "type": "integer",
+              "example": 123456
+            },
+            "total_recovered": {
+              "type": "integer",
+              "example": 120356
+            },
+            "total_death": {
+              "type": "integer",
+              "example": 3654
+            },
+            "total_vaccinated1": {
+              "type": "integer",
+              "example": 658545
+            },
+            "total_vaccinated2": {
+              "type": "integer",
+              "example": 365244
+            },
+            "total_tested": {
+              "type": "integer",
+              "example": 2356878
+            },
+            "last_updated": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2016-08-29T09:12:33.001Z"
+            }
+          }
+        }
+      }
+    }
+  }

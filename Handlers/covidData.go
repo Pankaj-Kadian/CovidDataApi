@@ -13,7 +13,8 @@ func GetCases(c echo.Context) error {
 
 	state := c.QueryParam("state")
 
-	fmt.Println(state)
+	// fmt.Println(state)
+
 	data, err := externalapis.GetData(state)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, "Invaild StateName")
